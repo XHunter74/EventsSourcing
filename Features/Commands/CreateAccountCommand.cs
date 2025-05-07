@@ -17,7 +17,7 @@ public class TestCommandHandler : ICommandHandler<CreateAccountCommand, Guid>
         _dbContext = dbContext;
     }
 
-    public async Task<Guid> HandleAsync(CreateAccountCommand command)
+    public async Task<Guid> HandleAsync(CreateAccountCommand command, CancellationToken cancellationToken)
     {
         var newEvent = new Event
         {
@@ -27,8 +27,8 @@ public class TestCommandHandler : ICommandHandler<CreateAccountCommand, Guid>
             StringData = command.OwnerName,
             Version = 1
         };
-        await _dbContext.Events.AddAsync(newEvent);
-        await _dbContext.SaveChangesAsync();
+        await _dbContext.Events.AddAsync(newEvent, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
         return newEvent.AggregateId;
     }
 }

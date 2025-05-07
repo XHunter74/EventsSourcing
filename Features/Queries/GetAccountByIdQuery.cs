@@ -20,14 +20,14 @@ public class GetAccountByIdQueryHandler : IQueryHandler<GetAccountByIdQuery, Acc
         _dbContext = dbContext;
     }
 
-    public async Task<AccountAggregate> HandleAsync(GetAccountByIdQuery query)
+    public async Task<AccountAggregate> HandleAsync(GetAccountByIdQuery query, CancellationToken cancellationToken)
     {
         var events = (await _dbContext.Events
             .Where(e => e.AggregateId == query.Id)
             .OrderBy(e => e.Created)
             .AsNoTracking()
-            .ToListAsync())
-            .Select(e => EventsMapper.ToDomainEvent(e))
+            .ToListAsync(cancellationToken))
+            .Select(EventsMapper.ToDomainEvent)
             .ToList();
         var account = new AccountAggregate();
         account.LoadsFromHistory(events);

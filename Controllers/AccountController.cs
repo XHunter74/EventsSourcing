@@ -17,25 +17,25 @@ public class AccountController : ControllerBase
     }
 
     [HttpGet("{id:guid}", Name = "GetAccountById")]
-    public async Task<IActionResult> GetAccountAsync(Guid id)
+    public async Task<IActionResult> GetAccountAsync(Guid id, CancellationToken cancellationToken)
     {
         var query = new GetAccountByIdQuery { Id = id };
-        var result = await _mediatr.QueryAsync(query);
+        var result = await _mediatr.QueryAsync(query, cancellationToken);
         return Ok(result);
     }
 
     [HttpPut("{id:guid}/deposit")]
-    public async Task<IActionResult> DepositAccountAsync(Guid id, decimal amount)
+    public async Task<IActionResult> DepositAccountAsync(Guid id, decimal amount, CancellationToken cancellationToken)
     {
         var command = new DepositAccountCommand { Id = id, Amount = amount };
-        var result = await _mediatr.SendAsync(command);
+        var result = await _mediatr.SendAsync(command, cancellationToken);
         return Ok(result);
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateNewAccountAsync(CreateAccountCommand command)
+    public async Task<IActionResult> CreateNewAccountAsync(CreateAccountCommand command, CancellationToken cancellationToken)
     {
-        var accountId = await _mediatr.SendAsync(command);
+        var accountId = await _mediatr.SendAsync(command, cancellationToken);
         return CreatedAtRoute("GetAccountById", new { id = accountId }, accountId);
     }
 }

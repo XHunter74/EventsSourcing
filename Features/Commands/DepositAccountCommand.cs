@@ -21,13 +21,13 @@ public class DepositAccountCommandHandler : ICommandHandler<DepositAccountComman
         _dbContext = dbContext;
     }
 
-    public async Task<AccountAggregate> HandleAsync(DepositAccountCommand command)
+    public async Task<AccountAggregate> HandleAsync(DepositAccountCommand command, CancellationToken cancellationToken)
     {
         var eventsData = await _dbContext.Events
             .Where(e => e.AggregateId == command.Id)
             .OrderBy(e => e.Created)
             .AsNoTracking()
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         var maxVersion = eventsData.Count != 0 ? eventsData.Max(e => e.Version) + 1 : 1;
 
@@ -39,8 +39,8 @@ public class DepositAccountCommandHandler : ICommandHandler<DepositAccountComman
             DecimalData = command.Amount,
             Version = maxVersion
         };
-        await _dbContext.Events.AddAsync(newEvent);
-        await _dbContext.SaveChangesAsync();
+        await _dbContext.Events.AddAsync(newEvent, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
         var domainEvents = eventsData
             .Select(EventsMapper.ToDomainEvent)
