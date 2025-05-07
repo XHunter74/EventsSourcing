@@ -23,11 +23,14 @@ public class DepositAccountCommandHandler : ICommandHandler<DepositAccountComman
 
     public async Task<AccountAggregate> HandleAsync(DepositAccountCommand command)
     {
-        var maxVersion = await _dbContext.Events
+        var eventsData = await _dbContext.Events
             .Where(e => e.AggregateId == command.Id)
+            .OrderBy(e => e.Created)
             .AsNoTracking()
-            .MaxAsync(e => e.Version);
-        maxVersion++;
+            .ToListAsync();
+
+        var maxVersion = eventsData.Count != 0 ? eventsData.Max(e => e.Version) + 1 : 1;
+
         var newEvent = new Event
         {
             AggregateId = command.Id,
@@ -38,15 +41,14 @@ public class DepositAccountCommandHandler : ICommandHandler<DepositAccountComman
         };
         await _dbContext.Events.AddAsync(newEvent);
         await _dbContext.SaveChangesAsync();
-        var events = (await _dbContext.Events
-            .Where(e => e.AggregateId == command.Id)
-            .OrderBy(e => e.Created)
-            .AsNoTracking()
-            .ToListAsync())
+
+        var domainEvents = eventsData
             .Select(EventsMapper.ToDomainEvent)
+            .Append(EventsMapper.ToDomainEvent(newEvent))
             .ToList();
+
         var account = new AccountAggregate();
-        account.LoadsFromHistory(events);
+        account.LoadsFromHistory(domainEvents);
         return account;
     }
 }
