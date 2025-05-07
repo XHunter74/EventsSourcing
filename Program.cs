@@ -1,3 +1,5 @@
+using EventSourcing.Extensions;
+
 namespace EventSourcing;
 
 public class Program
@@ -6,6 +8,7 @@ public class Program
     {
         CreateHostBuilder(args)
             .Build()
+            .ApplyDbMigrations()
             .Run();
     }
 

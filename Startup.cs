@@ -1,4 +1,6 @@
 ﻿using CQRSMediatr;
+using EventSourcing.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace EventSourcing;
 
@@ -14,11 +16,11 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddControllers();
-
         services.AddCqrsMediatr(typeof(Startup));
+        services.AddDbContext<EventStoreDbContext>(options =>
+                options.UseNpgsql(Configuration.GetConnectionString("DbConnection")));
     }
 
-    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder builder, IWebHostEnvironment env)
     {
         if (env.IsDevelopment())
