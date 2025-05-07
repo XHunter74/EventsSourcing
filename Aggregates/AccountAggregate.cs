@@ -5,7 +5,6 @@ namespace EventSourcing.Aggregates;
 
 public class AccountAggregate : AggregateRoot
 {
-    public Guid Id { get; private set; }
     public string OwnerName { get; private set; }
     public decimal Balance { get; private set; }
 
