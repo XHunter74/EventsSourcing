@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Aggregates\BankAccount.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="cqrs-mediatr" Version="1.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.15" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.15" />

@@ -1,5 +1,6 @@
 ﻿using CQRSMediatr.Interfaces;
 using EventSourcing.Features.Commands;
+using EventSourcing.Features.Queries;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EventSourcing.Controllers;
@@ -18,11 +19,9 @@ public class AccountController : ControllerBase
     [HttpGet("{id:guid}", Name = "GetAccountById")]
     public async Task<IActionResult> GetAccountAsync(Guid id)
     {
-        //var account = await _mediatr.SendAsync(new GetAccountQuery(id));
-        //if (account == null)
-        //    return NotFound();
-        //return Ok(account);
-        return Ok();
+        var query = new GetAccountByIdQuery { Id = id };
+        var result = await _mediatr.QueryAsync(query);
+        return Ok(result);
     }
 
     [HttpPost]
