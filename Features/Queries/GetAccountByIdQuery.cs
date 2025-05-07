@@ -25,6 +25,7 @@ public class GetAccountByIdQueryHandler : IQueryHandler<GetAccountByIdQuery, Acc
         var events = (await _dbContext.Events
             .Where(e => e.AggregateId == query.Id)
             .OrderBy(e => e.Created)
+            .AsNoTracking()
             .ToListAsync())
             .Select(e => EventsMapper.ToDomainEvent(e))
             .ToList();

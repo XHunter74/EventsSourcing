@@ -24,6 +24,14 @@ public class AccountController : ControllerBase
         return Ok(result);
     }
 
+    [HttpPut("{id:guid}/deposit")]
+    public async Task<IActionResult> DepositAccountAsync(Guid id, decimal amount)
+    {
+        var command = new DepositAccountCommand { Id = id, Amount = amount };
+        var result = await _mediatr.SendAsync(command);
+        return Ok(result);
+    }
+
     [HttpPost]
     public async Task<IActionResult> CreateNewAccountAsync(CreateAccountCommand command)
     {
