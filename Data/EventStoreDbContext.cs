@@ -28,6 +28,9 @@ public class EventStoreDbContext : DbContext
                 .HasConversion<string>();
             entity.Property(e => e.Version)
                 .IsRequired();
+            entity.HasIndex(e => e.AggregateId);
+            entity.HasIndex(e => e.AggregateType);
+            entity.HasIndex(e => e.Created);
         });
     }
 
