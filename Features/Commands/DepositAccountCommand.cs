@@ -1,6 +1,7 @@
 ﻿using CQRSMediatr.Interfaces;
 using EventSourcing.Aggregates;
 using EventSourcing.Data;
+using EventSourcing.Exceptions;
 using EventSourcing.Mappers;
 
 namespace EventSourcing.Features.Commands;
@@ -22,6 +23,10 @@ public class DepositAccountCommandHandler : BaseFeatureHandler, ICommandHandler<
     {
         var eventsData = await GetAggregateEvents(command.Id, cancellationToken: cancellationToken);
 
+        if (!eventsData.Any())
+        {
+            throw new NotFoundException($"Account with id {command.Id} not found.");
+        }
 
         var maxVersion = eventsData.Any() ? eventsData.Max(e => e.Version) + 1 : 1;
 

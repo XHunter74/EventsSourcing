@@ -1,6 +1,7 @@
 ﻿using CQRSMediatr.Interfaces;
 using EventSourcing.Aggregates;
 using EventSourcing.Data;
+using EventSourcing.Exceptions;
 using EventSourcing.Mappers;
 
 namespace EventSourcing.Features.Queries;
@@ -20,6 +21,11 @@ public class GetAccountByIdQueryHandler : BaseFeatureHandler, IQueryHandler<GetA
     {
         var events = (await GetAggregateEvents(query.Id, cancellationToken: cancellationToken))
             .Select(EventsMapper.ToDomainEvent);
+        if (!events.Any())
+        {
+            throw new NotFoundException($"Account with id {query.Id} not found.");
+        }
+
         var account = new AccountAggregate();
         account.LoadsFromHistory(events);
         return account;

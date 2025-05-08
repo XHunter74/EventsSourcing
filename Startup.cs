@@ -1,8 +1,10 @@
 ﻿using CQRSMediatr;
 using EventSourcing.Data;
+using EventSourcing.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
+using Serilog;
 
 namespace EventSourcing;
 
@@ -17,6 +19,10 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
+        services.AddLogging(e =>
+        {
+            e.AddSerilog();
+        });
         services.AddControllers();
         services.AddCqrsMediatr(typeof(Startup));
         services.AddDbContext<EventStoreDbContext>(options =>
@@ -56,6 +62,8 @@ public class Startup
             var assembly = Assembly.GetEntryAssembly();
             builder.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", assembly.FullName.Split(",").First()));
         }
+
+        builder.UseAppExceptionHandler();
 
         //Allow all CORS
         builder.UseCors("CorsPolicy");
