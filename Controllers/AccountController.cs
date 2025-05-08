@@ -33,6 +33,14 @@ public class AccountController : ControllerBase
         return Ok(result);
     }
 
+    [HttpPut("{id:guid}/withdraw")]
+    public async Task<IActionResult> WithdrawAccountAsync(Guid id, decimal amount, CancellationToken cancellationToken)
+    {
+        var command = new WithdrawAccountCommand { Id = id, Amount = amount };
+        var result = await _mediatr.SendAsync(command, cancellationToken);
+        return Ok(result);
+    }
+
     [HttpPost]
     public async Task<IActionResult> CreateNewAccountAsync(CreateAccountCommand command, CancellationToken cancellationToken)
     {
