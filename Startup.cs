@@ -28,7 +28,7 @@ public class Startup
         services.AddDbContext<EventStoreDbContext>(options =>
                 options.UseNpgsql(Configuration.GetConnectionString("DbConnection")));
 
-        // Ensure the required package is installed: Swashbuckle.AspNetCore
+        services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(c =>
         {
             var assembly = Assembly.GetEntryAssembly();
@@ -39,12 +39,11 @@ public class Startup
                     ?.InformationalVersion;
                 var assemblyName = assembly.GetName().Name;
 
-                if (version is { })
-                    c.SwaggerDoc("v1", new OpenApiInfo
-                    {
-                        Title = assemblyName,
-                        Version = version
-                    });
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = assemblyName,
+                    Version = version ?? "v1"
+                });
 
                 var xmlFile = Path.Combine(AppContext.BaseDirectory, $"{assemblyName}.xml");
                 if (File.Exists(xmlFile))
