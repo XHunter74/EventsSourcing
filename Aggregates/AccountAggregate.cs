@@ -17,7 +17,7 @@ public class AccountAggregate : AggregateRoot
         Balance = balance;
     }
 
-    public void Apply(IEvent @event)
+    public override void Apply(IEvent @event)
     {
         switch (@event)
         {
