@@ -1,25 +1,24 @@
 ﻿using CQRSMediatr.Interfaces;
-using EventSourcing.Aggregates;
 using EventSourcing.Data;
-using EventSourcing.Exceptions;
 using EventSourcing.Mappers;
+using EventSourcing.Models;
 
 namespace EventSourcing.Features.Commands;
 
-public class DepositAccountCommand : ICommand<AccountAggregate>
+public class DepositAccountCommand : ICommand<AccountDto>
 {
     public Guid Id { get; set; }
     public decimal Amount { get; set; }
 }
 
-public class DepositAccountCommandHandler : BaseAccountHandler, ICommandHandler<DepositAccountCommand, AccountAggregate>
+public class DepositAccountCommandHandler : BaseAccountHandler, ICommandHandler<DepositAccountCommand, AccountDto>
 {
 
     public DepositAccountCommandHandler(ILogger<DepositAccountCommandHandler> logger,
         EventStoreDbContext dbContext) : base(logger, dbContext)
     { }
 
-    public async Task<AccountAggregate> HandleAsync(DepositAccountCommand command, CancellationToken cancellationToken)
+    public async Task<AccountDto> HandleAsync(DepositAccountCommand command, CancellationToken cancellationToken)
     {
         var account = await GetAccountAggregateAsync(command.Id, null, cancellationToken);
 
@@ -36,6 +35,6 @@ public class DepositAccountCommandHandler : BaseAccountHandler, ICommandHandler<
 
         var domainEvent = EventsMapper.ToDomainEvent(newEvent);
         account.Apply(domainEvent);
-        return account;
+        return AccountMapper.ToDto(account);
     }
 }
