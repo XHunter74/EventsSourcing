@@ -47,7 +47,7 @@ public class Startup
 
                 var xmlFile = Path.Combine(AppContext.BaseDirectory, $"{assemblyName}.xml");
                 if (File.Exists(xmlFile))
-                    c.IncludeXmlComments(xmlFile);
+                    c.IncludeXmlComments(xmlFile, true);
             }
         });
     }
