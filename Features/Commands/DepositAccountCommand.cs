@@ -2,7 +2,6 @@
 using EventSourcing.Aggregates;
 using EventSourcing.Data;
 using EventSourcing.Mappers;
-using Microsoft.EntityFrameworkCore;
 
 namespace EventSourcing.Features.Commands;
 
@@ -12,24 +11,19 @@ public class DepositAccountCommand : ICommand<AccountAggregate>
     public decimal Amount { get; set; }
 }
 
-public class DepositAccountCommandHandler : ICommandHandler<DepositAccountCommand, AccountAggregate>
+public class DepositAccountCommandHandler : BaseFeatureHandler, ICommandHandler<DepositAccountCommand, AccountAggregate>
 {
-    private readonly EventStoreDbContext _dbContext;
 
-    public DepositAccountCommandHandler(EventStoreDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
+    public DepositAccountCommandHandler(ILogger<DepositAccountCommandHandler> logger,
+        EventStoreDbContext dbContext) : base(logger, dbContext)
+    { }
 
     public async Task<AccountAggregate> HandleAsync(DepositAccountCommand command, CancellationToken cancellationToken)
     {
-        var eventsData = await _dbContext.Events
-            .Where(e => e.AggregateId == command.Id)
-            .OrderBy(e => e.Created)
-            .AsNoTracking()
-            .ToListAsync(cancellationToken);
+        var eventsData = await GetAggregateEvents(command.Id, cancellationToken: cancellationToken);
 
-        var maxVersion = eventsData.Count != 0 ? eventsData.Max(e => e.Version) + 1 : 1;
+
+        var maxVersion = eventsData.Any() ? eventsData.Max(e => e.Version) + 1 : 1;
 
         var newEvent = new Event
         {
@@ -39,8 +33,8 @@ public class DepositAccountCommandHandler : ICommandHandler<DepositAccountComman
             DecimalData = command.Amount,
             Version = maxVersion
         };
-        await _dbContext.Events.AddAsync(newEvent, cancellationToken);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await DbContext.Events.AddAsync(newEvent, cancellationToken);
+        await DbContext.SaveChangesAsync(cancellationToken);
 
         var domainEvents = eventsData
             .Select(EventsMapper.ToDomainEvent)

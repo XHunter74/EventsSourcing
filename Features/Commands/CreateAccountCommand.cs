@@ -8,14 +8,12 @@ public class CreateAccountCommand : ICommand<Guid>
     public string OwnerName { get; set; }
 }
 
-public class TestCommandHandler : ICommandHandler<CreateAccountCommand, Guid>
+public class CreateAccountHandler : BaseFeatureHandler, ICommandHandler<CreateAccountCommand, Guid>
 {
-    private readonly EventStoreDbContext _dbContext;
 
-    public TestCommandHandler(EventStoreDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
+    public CreateAccountHandler(ILogger<CreateAccountHandler> logger,
+        EventStoreDbContext dbContext) : base(logger, dbContext)
+    { }
 
     public async Task<Guid> HandleAsync(CreateAccountCommand command, CancellationToken cancellationToken)
     {
@@ -27,8 +25,8 @@ public class TestCommandHandler : ICommandHandler<CreateAccountCommand, Guid>
             StringData = command.OwnerName,
             Version = 1
         };
-        await _dbContext.Events.AddAsync(newEvent, cancellationToken);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await DbContext.Events.AddAsync(newEvent, cancellationToken);
+        await DbContext.SaveChangesAsync(cancellationToken);
         return newEvent.AggregateId;
     }
 }
