@@ -12,7 +12,7 @@ public class DepositAccountCommand : ICommand<AccountAggregate>
     public decimal Amount { get; set; }
 }
 
-public class DepositAccountCommandHandler : BaseFeatureHandler, ICommandHandler<DepositAccountCommand, AccountAggregate>
+public class DepositAccountCommandHandler : BaseAccountHandler, ICommandHandler<DepositAccountCommand, AccountAggregate>
 {
 
     public DepositAccountCommandHandler(ILogger<DepositAccountCommandHandler> logger,
@@ -21,14 +21,7 @@ public class DepositAccountCommandHandler : BaseFeatureHandler, ICommandHandler<
 
     public async Task<AccountAggregate> HandleAsync(DepositAccountCommand command, CancellationToken cancellationToken)
     {
-        var eventsData = await GetAggregateEvents(command.Id, cancellationToken: cancellationToken);
-
-        if (!eventsData.Any())
-        {
-            throw new NotFoundException($"Account with id {command.Id} not found.");
-        }
-
-        var maxVersion = eventsData.Any() ? eventsData.Max(e => e.Version) + 1 : 1;
+        var account = await GetAccountAggregateAsync(command.Id, null, cancellationToken);
 
         var newEvent = new Event
         {
@@ -36,18 +29,13 @@ public class DepositAccountCommandHandler : BaseFeatureHandler, ICommandHandler<
             AggregateType = AggregateType.Account,
             EventType = EventType.MoneyDeposited,
             DecimalData = command.Amount,
-            Version = maxVersion
+            Version = account.Version + 1
         };
         await DbContext.Events.AddAsync(newEvent, cancellationToken);
         await DbContext.SaveChangesAsync(cancellationToken);
 
-        var domainEvents = eventsData
-            .Select(EventsMapper.ToDomainEvent)
-            .Append(EventsMapper.ToDomainEvent(newEvent))
-            .ToList();
-
-        var account = new AccountAggregate();
-        account.LoadsFromHistory(domainEvents);
+        var domainEvent = EventsMapper.ToDomainEvent(newEvent);
+        account.Apply(domainEvent);
         return account;
     }
 }

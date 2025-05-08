@@ -1,4 +1,5 @@
 ﻿using CQRSMediatr.Interfaces;
+using EventSourcing.Data;
 using EventSourcing.Features.Commands;
 using EventSourcing.Features.Queries;
 using Microsoft.AspNetCore.Mvc;
@@ -17,9 +18,9 @@ public class AccountController : ControllerBase
     }
 
     [HttpGet("{id:guid}", Name = "GetAccountById")]
-    public async Task<IActionResult> GetAccountAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAccountAsync(Guid id, int? version, CancellationToken cancellationToken)
     {
-        var query = new GetAccountByIdQuery { Id = id };
+        var query = new GetAccountByIdQuery { Id = id, Version = version };
         var result = await _mediatr.QueryAsync(query, cancellationToken);
         return Ok(result);
     }
@@ -37,5 +38,13 @@ public class AccountController : ControllerBase
     {
         var accountId = await _mediatr.SendAsync(command, cancellationToken);
         return CreatedAtRoute("GetAccountById", new { id = accountId }, accountId);
+    }
+
+    [HttpPost("{id:guid}/save")]
+    public async Task<IActionResult> SaveAccountProjectionAsync(Guid id, CancellationToken cancellationToken)
+    {
+        var command = new SaveAccountProjectionCommand { Id = id };
+        var result = await _mediatr.SendAsync(command, cancellationToken);
+        return CreatedAtRoute("GetAccountById", new { id = result.Id }, result);
     }
 }

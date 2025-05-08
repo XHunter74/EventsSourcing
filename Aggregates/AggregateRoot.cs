@@ -12,6 +12,14 @@ public abstract class AggregateRoot
 
     public void ClearUncommittedEvents() => _uncommittedEvents.Clear();
 
+    protected AggregateRoot() { }
+
+    protected AggregateRoot(Guid id, int version)
+    {
+        Id = id;
+        Version = version;
+    }
+
     protected void ApplyChange(IEvent @event, bool isNew = true)
     {
         var method = GetType().GetMethod("Apply", new[] { @event.GetType() });
@@ -25,7 +33,7 @@ public abstract class AggregateRoot
 
     public void LoadsFromHistory(IEnumerable<IEvent> history)
     {
-        foreach (var e in history)
+        foreach (var e in history.Where(e => e.Version > Version))
             ApplyChange(e, false);
     }
 }

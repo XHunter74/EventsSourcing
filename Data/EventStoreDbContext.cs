@@ -4,6 +4,7 @@ namespace EventSourcing.Data;
 public class EventStoreDbContext : DbContext
 {
     public DbSet<Event> Events { get; set; }
+    public DbSet<Account> Accounts { get; set; }
 
     public EventStoreDbContext(DbContextOptions<EventStoreDbContext> options)
     : base(options) { }
@@ -12,6 +13,7 @@ public class EventStoreDbContext : DbContext
     {
         builder.HasPostgresExtension("uuid-ossp");
 
+        #region Event
         builder.Entity<Event>(entity =>
         {
             entity
@@ -32,6 +34,20 @@ public class EventStoreDbContext : DbContext
             entity.HasIndex(e => e.AggregateType);
             entity.HasIndex(e => e.Created);
         });
+        #endregion
+
+        #region Account
+        builder.Entity<Account>(entity =>
+        {
+            entity
+                .HasKey(e => new { e.Id, e.Version });
+            entity.Property(e => e.OwnerName)
+                .IsRequired();
+            entity.Property(e => e.Balance)
+                .IsRequired();
+            entity.HasIndex(e => e.Created);
+        });
+        #endregion
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

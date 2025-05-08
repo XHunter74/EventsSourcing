@@ -1,33 +1,25 @@
 ﻿using CQRSMediatr.Interfaces;
-using EventSourcing.Aggregates;
 using EventSourcing.Data;
-using EventSourcing.Exceptions;
 using EventSourcing.Mappers;
+using EventSourcing.Models;
 
 namespace EventSourcing.Features.Queries;
 
-public class GetAccountByIdQuery : IQuery<AccountAggregate>
+public class GetAccountByIdQuery : IQuery<AccountDto>
 {
     public Guid Id { get; set; }
+    public int? Version { get; set; }
 }
 
-public class GetAccountByIdQueryHandler : BaseFeatureHandler, IQueryHandler<GetAccountByIdQuery, AccountAggregate>
+public class GetAccountByIdQueryHandler : BaseAccountHandler, IQueryHandler<GetAccountByIdQuery, AccountDto>
 {
     public GetAccountByIdQueryHandler(ILogger<GetAccountByIdQueryHandler> logger,
         EventStoreDbContext dbContext) : base(logger, dbContext)
     { }
 
-    public async Task<AccountAggregate> HandleAsync(GetAccountByIdQuery query, CancellationToken cancellationToken)
+    public async Task<AccountDto> HandleAsync(GetAccountByIdQuery query, CancellationToken cancellationToken)
     {
-        var events = (await GetAggregateEvents(query.Id, cancellationToken: cancellationToken))
-            .Select(EventsMapper.ToDomainEvent);
-        if (!events.Any())
-        {
-            throw new NotFoundException($"Account with id {query.Id} not found.");
-        }
-
-        var account = new AccountAggregate();
-        account.LoadsFromHistory(events);
-        return account;
+        var account = await GetAccountAggregateAsync(query.Id, query.Version, cancellationToken: cancellationToken);
+        return AccountMapper.ToDto(account);
     }
 }

@@ -1,7 +1,5 @@
 ﻿using EventSourcing.Data;
 using Microsoft.EntityFrameworkCore;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
-using System.Threading;
 
 namespace EventSourcing.Features;
 
@@ -16,14 +14,14 @@ public abstract class BaseFeatureHandler
     public ILogger Logger { get; }
     public EventStoreDbContext DbContext { get; }
 
-    public async Task<IEnumerable<Event>> GetAggregateEvents(Guid aggregateId,
+    public async Task<IEnumerable<Event>> GetAggregateEventsAsync(Guid aggregateId,
         int? version = 0, CancellationToken cancellationToken = default)
     {
         var query = DbContext.Events
             .Where(e => e.AggregateId == aggregateId);
         if (version.HasValue)
         {
-            query = query.Where(e => e.Version > version);
+            query = query.Where(e => e.Version <= version);
         }
         var events = await query
             .OrderBy(e => e.Created)
