@@ -1,6 +1,6 @@
 ﻿namespace EventSourcing.Data;
 
-public class Account : BaseEntity
+public class Account : AggregateBaseEntity
 {
     public Guid Id { get; set; }
     public string OwnerName { get; set; }
