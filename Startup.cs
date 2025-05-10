@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 using Serilog;
+using EventSourcing.Services;
 
 namespace EventSourcing;
 
@@ -27,6 +28,7 @@ public class Startup
         services.AddCqrsMediatr(typeof(Startup));
         services.AddDbContext<EventStoreDbContext>(options =>
                 options.UseNpgsql(Configuration.GetConnectionString("DbConnection")));
+        services.AddScoped<IAccountService, AccountService>();
 
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(c =>

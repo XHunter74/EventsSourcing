@@ -1,7 +1,7 @@
 ﻿using CQRSMediatr.Interfaces;
-using EventSourcing.Data;
 using EventSourcing.Mappers;
 using EventSourcing.Models;
+using EventSourcing.Services;
 
 namespace EventSourcing.Features.Queries;
 
@@ -11,15 +11,15 @@ public class GetAccountByIdQuery : IQuery<AccountDto>
     public int? Version { get; set; }
 }
 
-public class GetAccountByIdQueryHandler : BaseAccountHandler, IQueryHandler<GetAccountByIdQuery, AccountDto>
+public class GetAccountByIdQueryHandler : BaseFeatureHandler, IQueryHandler<GetAccountByIdQuery, AccountDto>
 {
     public GetAccountByIdQueryHandler(ILogger<GetAccountByIdQueryHandler> logger,
-        EventStoreDbContext dbContext) : base(logger, dbContext)
+        IAccountService accountService) : base(logger, accountService)
     { }
 
     public async Task<AccountDto> HandleAsync(GetAccountByIdQuery query, CancellationToken cancellationToken)
     {
-        var account = await GetAccountAggregateAsync(query.Id, query.Version, cancellationToken: cancellationToken);
+        var account = await AccountService.GetAccountByIdAsync(query.Id, query.Version, cancellationToken);
         return AccountMapper.ToDto(account);
     }
 }
