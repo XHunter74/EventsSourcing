@@ -17,6 +17,7 @@ public class Program
     {
         return Host.CreateDefaultBuilder(args)
             .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); })
-            .UseSerilog();
+            .UseSerilog((context, configuration) =>
+                configuration.ReadFrom.Configuration(context.Configuration)); 
     }
 }
