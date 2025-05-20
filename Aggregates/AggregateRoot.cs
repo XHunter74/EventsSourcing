@@ -20,6 +20,10 @@ public abstract class AggregateRoot
     public void LoadsFromHistory(IEnumerable<IEvent> history)
     {
         foreach (var e in history.Where(e => e.Version > Version))
-            Apply(e);
+            if (e.Version > Version)
+            {
+                Version = e.Version;
+                Apply(e);
+            }
     }
 }

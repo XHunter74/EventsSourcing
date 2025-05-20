@@ -25,15 +25,12 @@ public class AccountAggregate : AggregateRoot
                 Id = e.AccountId;
                 OwnerName = e.OwnerName;
                 Balance = 0;
-                Version = e.Version;
                 break;
             case MoneyDeposited e:
                 Balance += e.Amount;
-                Version = e.Version;
                 break;
             case MoneyWithdrawn e:
                 Balance -= e.Amount;
-                Version = e.Version;
                 break;
         }
     }
