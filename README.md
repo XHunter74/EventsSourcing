@@ -23,6 +23,7 @@ The project exposes a REST API for managing bank accounts, supporting operations
 - Serilog (logging)
 - Swashbuckle (Swagger/OpenAPI)
 - CQRSMediatr (CQRS and Mediator implementation)
+- **Aspire (.NET Aspire)** (cloud-native development, environment orchestration)
 
 ## Project Structure
 
@@ -36,11 +37,19 @@ The project exposes a REST API for managing bank accounts, supporting operations
 - `Mappers/` - Mapping between domain models and DTOs
 - `Models/` - DTOs
 
-## Running the Project
 
-1. Ensure PostgreSQL is running and the connection string in `appsettings.Development.json` is correct.
-2. Run database migrations (applied automatically on startup).
-3. Start the application. Swagger UI will be available at `/swagger`.
+## Building and Running the Project with Aspire
+
+This project uses **.NET Aspire** to orchestrate the development environment, including infrastructure dependencies like PostgreSQL and RabbitMQ. Aspire simplifies local development and deployment by managing service lifecycles and configuration.
+
+### Steps:
+
+1. Ensure you have the [.NET Aspire workload](https://learn.microsoft.com/en-us/dotnet/aspire/get-started/install) installed.
+2. Open the solution in Visual Studio or VS Code.
+3. Start the Aspire AppHost project (`EventSourcing.Aspire.AppHost`). This will automatically provision and start all required services (including PostgreSQL and RabbitMQ) and the main application.
+4. Swagger UI will be available at `/swagger` once the application is running.
+
+You no longer need to manually start PostgreSQL or RabbitMQ—Aspire handles this for you.
 
 ## API Endpoints
 
