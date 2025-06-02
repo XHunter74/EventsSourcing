@@ -9,4 +9,5 @@ public interface IAccountService
     Task<AccountAggregate> GetAccountByIdAsync(Guid id, int? version, CancellationToken cancellationToken);
     Task<AccountAggregate> SaveAccountProjectionAsync(Guid id, CancellationToken cancellationToken);
     Task<AccountAggregate> WithdrawAccountAsync(Guid id, decimal amount, CancellationToken cancellationToken);
+    Task<AccountAggregate[]> GetAllAccounts(CancellationToken cancellationToken);
 }

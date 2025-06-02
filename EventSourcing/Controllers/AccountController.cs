@@ -21,6 +21,22 @@ public class AccountController : ControllerBase
         _mediatr = mediatr;
     }
 
+
+    /// <summary>
+    /// Retrieves all accounts.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token to cancel the operation.</param>
+    /// <returns>Returns a list of all accounts.</returns>
+    /// <response code="200">Returns the list of accounts.</response>
+    [HttpGet]
+    [ProducesResponseType(typeof(IEnumerable<AccountDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetAccountsAsync(CancellationToken cancellationToken)
+    {
+        var query = new GetAllAccountsQuery();
+        var result = await _mediatr.QueryAsync(query, cancellationToken);
+        return Ok(result);
+    }
+
     /// <summary>
     /// Get accounts by Id.
     /// </summary>

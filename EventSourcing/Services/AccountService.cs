@@ -157,4 +157,23 @@ public class AccountService : IAccountService
         await _dbContext.SaveChangesAsync(cancellationToken);
         return account;
     }
+
+    public async Task<AccountAggregate[]> GetAllAccounts(CancellationToken cancellationToken)
+    {
+        var events = await _dbContext.Events
+            .Where(e => e.AggregateType == AggregateType.Account && e.Version == 1)
+            .OrderBy(e => e.Created)
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+
+        var result = new List<AccountAggregate>();
+
+        foreach (var e in events)
+        {
+            var account = new AccountAggregate();
+            account.Apply(EventsMapper.ToDomainEvent(e));
+            result.Add(account);
+        }
+        return result.ToArray();
+    }
 }
