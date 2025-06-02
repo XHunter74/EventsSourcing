@@ -1,5 +1,5 @@
 ﻿using CQRSMediatr.Interfaces;
-using EventSourcing.Services;
+using EventSourcing.Services.Interfaces;
 
 namespace EventSourcing.Features.Commands;
 

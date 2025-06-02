@@ -1,6 +1,6 @@
 ﻿using CQRSMediatr.Interfaces;
 using EventSourcing.Models;
-using EventSourcing.Services;
+using EventSourcing.Services.Interfaces;
 
 namespace EventSourcing.Features.Queries;
 

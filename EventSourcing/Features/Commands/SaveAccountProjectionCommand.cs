@@ -4,7 +4,7 @@ using EventSourcing.Data;
 using EventSourcing.Exceptions;
 using EventSourcing.Mappers;
 using EventSourcing.Models;
-using EventSourcing.Services;
+using EventSourcing.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace EventSourcing.Features.Commands;

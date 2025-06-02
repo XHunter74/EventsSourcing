@@ -1,6 +1,6 @@
 ﻿using EventSourcing.Aggregates;
 
-namespace EventSourcing.Services;
+namespace EventSourcing.Services.Interfaces;
 
 public interface IAccountService
 {

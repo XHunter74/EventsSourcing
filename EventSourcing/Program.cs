@@ -1,5 +1,7 @@
-using Serilog;
 using EventSourcing.Extensions;
+using EventSourcing.Services;
+using Microsoft.Extensions.Hosting;
+using Serilog;
 
 namespace EventSourcing;
 
@@ -10,6 +12,8 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         builder.AddServiceDefaults();
+
+        builder.AddRabbitMQClient(connectionName: "Rabbit");
 
         builder.Host.UseSerilog((context, configuration) =>
             configuration.ReadFrom.Configuration(context.Configuration));

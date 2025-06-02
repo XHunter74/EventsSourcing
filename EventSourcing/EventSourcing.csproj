@@ -7,6 +7,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Aspire.RabbitMQ.Client" Version="9.3.0" />
 		<PackageReference Include="cqrs-mediatr" Version="1.0.2" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.15" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.15" />

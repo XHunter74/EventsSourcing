@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using System.Reflection;
 using Serilog;
 using EventSourcing.Services;
+using EventSourcing.Services.Interfaces;
 
 namespace EventSourcing;
 
@@ -30,6 +31,7 @@ public class Startup
         services.AddDbContext<EventStoreDbContext>(options =>
                 options.UseNpgsql(Configuration.GetConnectionString("DbConnection")));
         services.AddScoped<IAccountService, AccountService>();
+        services.AddScoped<IMessageBusService, RabbitMqService>();
 
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(c =>
@@ -67,7 +69,7 @@ public class Startup
 
         builder.UseAppExceptionHandler();
 
-        //Allow all CORS
+        // Allow all CORS
         builder.UseCors("CorsPolicy");
 
         builder.UseRouting();

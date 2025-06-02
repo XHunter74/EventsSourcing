@@ -1,7 +1,7 @@
 ﻿using CQRSMediatr.Interfaces;
 using EventSourcing.Mappers;
 using EventSourcing.Models;
-using EventSourcing.Services;
+using EventSourcing.Services.Interfaces;
 
 namespace EventSourcing.Features.Commands;
 

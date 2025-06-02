@@ -2,6 +2,8 @@
 using EventSourcing.Data;
 using EventSourcing.Exceptions;
 using EventSourcing.Mappers;
+using EventSourcing.Models;
+using EventSourcing.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace EventSourcing.Services;
@@ -10,10 +12,15 @@ public class AccountService : IAccountService
 {
     private readonly ILogger<AccountService> _logger;
     private readonly EventStoreDbContext _dbContext;
-    public AccountService(ILogger<AccountService> logger, EventStoreDbContext dbContext)
+    private readonly IMessageBusService _messageBusService;
+
+    public AccountService(ILogger<AccountService> logger,
+        EventStoreDbContext dbContext,
+        IMessageBusService messageBusService)
     {
         _logger = logger;
         _dbContext = dbContext;
+        _messageBusService = messageBusService;
     }
 
     public async Task<Guid> CreateAccountAsync(string ownerName, CancellationToken cancellationToken)
@@ -28,6 +35,16 @@ public class AccountService : IAccountService
         };
         await _dbContext.Events.AddAsync(newEvent, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
+
+        var logEvent= new LogMessageDto { 
+            AggregateId = newEvent.AggregateId, 
+            AggregateType = AggregateType.Account, 
+            EventType = EventType.AccountCreated,
+            Message = $"Account created for {ownerName}",
+        };
+
+        await _messageBusService.SendMessageToQueue(Constants.LogQueueName, logEvent);
+
         return newEvent.AggregateId;
     }
 
@@ -62,6 +79,16 @@ public class AccountService : IAccountService
         await _dbContext.Events.AddAsync(newEvent, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
+        var logEvent = new LogMessageDto
+        {
+            AggregateId = newEvent.AggregateId,
+            AggregateType = AggregateType.Account,
+            EventType = EventType.MoneyDeposited,
+            Message = $"Account deposited for {amount}",
+        };
+
+        await _messageBusService.SendMessageToQueue(Constants.LogQueueName, logEvent);
+
         var domainEvent = EventsMapper.ToDomainEvent(newEvent);
         account.Apply(domainEvent);
         return account;
@@ -86,6 +113,14 @@ public class AccountService : IAccountService
         };
         await _dbContext.Events.AddAsync(newEvent, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
+
+        var logEvent = new LogMessageDto
+        {
+            AggregateId = newEvent.AggregateId,
+            AggregateType = AggregateType.Account,
+            EventType = EventType.MoneyWithdrawn,
+            Message = $"Account withdrawn for {amount}",
+        };
 
         var domainEvent = EventsMapper.ToDomainEvent(newEvent);
         account.Apply(domainEvent);
