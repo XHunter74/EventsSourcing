@@ -12,11 +12,11 @@ namespace EventSourcing.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-public class AccountController : ControllerBase
+public class AccountsController : ControllerBase
 {
     private readonly ICqrsMediatr _mediatr;
 
-    public AccountController(ICqrsMediatr mediatr)
+    public AccountsController(ICqrsMediatr mediatr)
     {
         _mediatr = mediatr;
     }
