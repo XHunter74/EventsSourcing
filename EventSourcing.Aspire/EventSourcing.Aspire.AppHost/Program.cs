@@ -9,6 +9,13 @@ var postgres = builder.AddPostgres("postgres", username, password)
     .WithPgAdmin();
 var postgresdb = postgres.AddDatabase("event-sourcing");
 
+var rabbitUsername = builder.AddParameter("rabbit-username", secret: true);
+var rabbitPassword = builder.AddParameter("rabbit-password", secret: true);
+
+var rabbitmq = builder.AddRabbitMQ("rabbit", rabbitUsername, rabbitPassword)
+    .WithDataBindMount(source: @".\RabbitMQ\Data", isReadOnly: false)
+    .WithManagementPlugin();
+
 
 // Register the API project and connect it to the Postgres database
 builder.AddProject<Projects.EventSourcing>("api")
