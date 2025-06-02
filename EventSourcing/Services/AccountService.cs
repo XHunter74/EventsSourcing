@@ -25,6 +25,7 @@ public class AccountService : IAccountService
 
     public async Task<Guid> CreateAccountAsync(string ownerName, CancellationToken cancellationToken)
     {
+        _logger.LogInformation("Called CreateAccountAsync with ownerName: {OwnerName}", ownerName);
         var newEvent = new Event
         {
             AggregateId = Guid.NewGuid(),
@@ -66,6 +67,7 @@ public class AccountService : IAccountService
 
     public async Task<AccountAggregate> DepositAccountAsync(Guid id, decimal amount, CancellationToken cancellationToken)
     {
+        _logger.LogInformation("Called DepositAccountAsync with id: {Id}, amount: {Amount}", id, amount);
         var account = await GetAccountAggregateAsync(id, null, cancellationToken);
 
         var newEvent = new Event
@@ -96,10 +98,12 @@ public class AccountService : IAccountService
 
     public async Task<AccountAggregate> WithdrawAccountAsync(Guid id, decimal amount, CancellationToken cancellationToken)
     {
+        _logger.LogInformation("Called WithdrawAccountAsync with id: {Id}, amount: {Amount}", id, amount);
         var account = await GetAccountAggregateAsync(id, null, cancellationToken);
 
         if (account.Balance < amount)
         {
+            _logger.LogWarning("Insufficient balance for withdrawal. AccountId: {Id}, Balance: {Balance}, Attempted: {Amount}", id, account.Balance, amount);
             throw new BadRequestException($"Insuficient account balans: {account.Balance}");
         }
 
@@ -131,6 +135,7 @@ public class AccountService : IAccountService
 
     public async Task<AccountAggregate> GetAccountByIdAsync(Guid id, int? version, CancellationToken cancellationToken)
     {
+        _logger.LogInformation("Called GetAccountByIdAsync with id: {Id}, version: {Version}", id, version);
         var account = await GetAccountAggregateAsync(id, version, cancellationToken: cancellationToken);
         return account;
     }
@@ -181,6 +186,7 @@ public class AccountService : IAccountService
 
     public async Task<AccountAggregate> SaveAccountProjectionAsync(Guid id, CancellationToken cancellationToken)
     {
+        _logger.LogInformation("Called SaveAccountProjectionAsync with id: {Id}", id);
         var account = await GetAccountAggregateAsync(id, null, cancellationToken: cancellationToken);
 
         var newAccountRecord = new Account
@@ -197,6 +203,7 @@ public class AccountService : IAccountService
 
     public async Task<AccountAggregate[]> GetAllAccounts(CancellationToken cancellationToken)
     {
+        _logger.LogInformation("Called GetAllAccounts");
         var events = await _dbContext.Events
             .Where(e => e.AggregateType == AggregateType.Account && e.Version == 1)
             .OrderBy(e => e.Created)
