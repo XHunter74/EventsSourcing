@@ -122,6 +122,8 @@ public class AccountService : IAccountService
             Message = $"Account withdrawn for {amount}",
         };
 
+        await _messageBusService.SendMessageToQueue(Constants.LogQueueName, logEvent);
+
         var domainEvent = EventsMapper.ToDomainEvent(newEvent);
         account.Apply(domainEvent);
         return account;

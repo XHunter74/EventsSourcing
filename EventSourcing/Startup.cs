@@ -31,7 +31,8 @@ public class Startup
         services.AddDbContext<EventStoreDbContext>(options =>
                 options.UseNpgsql(Configuration.GetConnectionString("DbConnection")));
         services.AddScoped<IAccountService, AccountService>();
-        services.AddScoped<IMessageBusService, RabbitMqService>();
+        services.AddSingleton<IMessageBusService, RabbitMqService>();
+        services.AddHostedService<LoggerService>();
 
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(c =>
