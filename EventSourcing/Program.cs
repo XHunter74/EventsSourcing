@@ -28,6 +28,8 @@ public class Program
 
         app.ApplyDbMigrations();
 
+        app.MapDefaultEndpoints();
+
         app.Run();
     }
 }
