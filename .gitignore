@@ -5,3 +5,4 @@ logs/
 EventSourcing.Aspire/EventSourcing.Aspire.AppHost/PostgreSQL/
 EventSourcing.Aspire/EventSourcing.Aspire.AppHost/RabbitMQ/
 Data/
+Documents/
