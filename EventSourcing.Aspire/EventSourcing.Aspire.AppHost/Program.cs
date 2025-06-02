@@ -17,7 +17,6 @@ var rabbitmq = builder.AddRabbitMQ("rabbit", rabbitUsername, rabbitPassword)
     .WithManagementPlugin();
 
 
-// Register the API project and connect it to the Postgres database
 builder.AddProject<Projects.EventSourcing>("api")
     .WithReference(postgresdb, "DbConnection")
     .WithReference(rabbitmq, "Rabbit")
