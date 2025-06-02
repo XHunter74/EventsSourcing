@@ -21,6 +21,7 @@ var rabbitmq = builder.AddRabbitMQ("rabbit", rabbitUsername, rabbitPassword)
 builder.AddProject<Projects.EventSourcing>("api")
     .WithReference(postgresdb, "DbConnection")
     .WithReference(rabbitmq, "Rabbit")
-    .WaitFor(postgresdb);
+    .WaitFor(postgresdb)
+    .WaitFor(rabbitmq);
 
 builder.Build().Run();
