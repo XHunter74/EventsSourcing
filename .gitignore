@@ -2,3 +2,4 @@
 bin/
 obj/
 logs/
+EventSourcing.Aspire/EventSourcing.Aspire.AppHost/PostgreSQL/
