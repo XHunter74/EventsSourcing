@@ -3,6 +3,7 @@ using EventSourcing.Data;
 using EventSourcing.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using Microsoft.Extensions.Hosting;
 using System.Reflection;
 using Serilog;
 using EventSourcing.Services;

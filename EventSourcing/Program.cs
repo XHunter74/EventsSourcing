@@ -7,17 +7,23 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        CreateHostBuilder(args)
-            .Build()
-            .ApplyDbMigrations()
-            .Run();
-    }
+        var builder = WebApplication.CreateBuilder(args);
 
-    public static IHostBuilder CreateHostBuilder(string[] args)
-    {
-        return Host.CreateDefaultBuilder(args)
-            .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); })
-            .UseSerilog((context, configuration) =>
-                configuration.ReadFrom.Configuration(context.Configuration)); 
+        builder.AddServiceDefaults();
+
+        builder.Host.UseSerilog((context, configuration) =>
+            configuration.ReadFrom.Configuration(context.Configuration));
+
+        var startup = new Startup(builder.Configuration);
+        startup.ConfigureServices(builder.Services);
+
+        var app = builder.Build();
+
+        var env = app.Services.GetRequiredService<IWebHostEnvironment>();
+        startup.Configure(app, env);
+
+        app.ApplyDbMigrations();
+
+        app.Run();
     }
 }
