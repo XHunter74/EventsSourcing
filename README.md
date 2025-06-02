@@ -44,7 +44,7 @@ This project uses **.NET Aspire** to orchestrate the development environment, in
 
 ### Steps:
 
-1. Ensure you have the [.NET Aspire workload](https://learn.microsoft.com/en-us/dotnet/aspire/get-started/install) installed.
+1. Ensure you have the [.NET Aspire workload](https://learn.microsoft.com/en-us/dotnet/aspire/get-started/build-your-first-aspire-app?pivots=visual-studio) installed.
 2. Open the solution in Visual Studio or VS Code.
 3. Start the Aspire AppHost project (`EventSourcing.Aspire.AppHost`). This will automatically provision and start all required services (including PostgreSQL and RabbitMQ) and the main application.
 4. Swagger UI will be available at `/swagger` once the application is running.
